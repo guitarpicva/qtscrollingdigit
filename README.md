@@ -1,5 +1,7 @@
 # qtscrollingdigit
 A Qt project to implement mouse wheel scrollable "digits" for UI
+![image](https://user-images.githubusercontent.com/16414991/206474498-c63a0f11-d27e-4744-b326-4d5bd6b40f63.png)
+
 
 Read the source for more implementation information, but essentially, this sub-classes QLabel to provide a mouse wheel scrollable "digit" (any item that is incrementally set).
 
