@@ -101,7 +101,7 @@ void FT450D::setupScrollingLabels()
 }
 
 ````
-
+on_rolledUp, on_rolledDown, and goToZero are left here as application dependent slot implementations.  Essentially, goToZero just resets the digit to zero.  on_rolledUp and on_rolledDown are dependent on how the application and it's potential hardware may need to react to these events.
 
 ````
 void FT450D::on_valueChanged(const int newval)
