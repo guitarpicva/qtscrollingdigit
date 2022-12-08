@@ -5,7 +5,99 @@ Read the source for more implementation information, but essentially, this sub-c
 
 This example implementation is for a Ham Radio frequency display where the left-most scrollable is 10's of Megahertz.  Subsequent scrollables are 100 kHz, 10 kHz, 1 kHz, 100 Hz, 10 Hz and 1 Hz.  Concatenating the textual values of the scrolled digits creates a QString of the frequency value which is used by remote control protocols such as CAT to set the frequency on the radio.  The opposite is also possible by reading the CAT value of the radio frequency and setting the scrollable digits to match.
 
-An example for the Yaesu FT-450D:
+An example for the Yaesu FT-450D where mhz10, khz100, khz10, khz1, hz100, hz10 and hz1 are ScrollableDigits objects.
+
+````
+void FT450D::setupScrollingLabels()
+{
+    // scrolling labels for control of active VFO
+    mhz10 = new ScrollingDigitLabel();
+    mhz10->setMin(0);
+    mhz10->setMax(53);
+    mhz10->b_roll = false;
+    mhz10->setMarkMax(true); // signal when max value reached
+    mhz10->setStyleSheet(FREQ_STYLE);
+    mhz10->setNum(14);
+    mhz10->setMaximumWidth(37);
+//    ScrollingDigitLabel * mhz1 = new ScrollingDigitLabel();
+//    mhz1.setNum(9);
+//    mhz1->setStyleSheet(FREQ_STYLE);
+    khz100 = new ScrollingDigitLabel();
+    khz100->setStyleSheet(FREQ_STYLE);
+    khz100->setNum(9);
+    khz100->setMaximumWidth(19);
+    khz10 = new ScrollingDigitLabel();
+    khz10->setStyleSheet(FREQ_STYLE);
+    khz10->setNum(2);
+    khz10->setMaximumWidth(19);
+    khz1 = new ScrollingDigitLabel();
+    khz1->setStyleSheet(FREQ_STYLE);
+    khz1->setNum(8);
+    khz1->setMaximumWidth(19);
+    QLabel * dot = new QLabel(".");
+    dot->setStyleSheet(FREQ_STYLE);
+    dot->setMaximumWidth(12);
+    dot->setAlignment(Qt::AlignHCenter);
+    hz100 = new ScrollingDigitLabel();
+    hz100->setStyleSheet(FREQ_STYLE);
+    hz100->setNum(5);
+    hz100->setMaximumWidth(19);
+    hz10 = new ScrollingDigitLabel();
+    hz10->setStyleSheet(FREQ_STYLE);
+    hz10->setNum(0);
+    hz10->setMaximumWidth(19);
+    hz1 = new ScrollingDigitLabel();
+    hz1->setStyleSheet(FREQ_STYLE);
+    hz1->setNum(0);
+    hz1->setMaximumWidth(19);
+    connect(mhz10, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(khz100, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(khz10, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(khz1, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(hz100, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(hz10, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(hz1, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    // digit hit max so go to zero on all to the right
+    connect(mhz10, &ScrollingDigitLabel::goToZero, khz100, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::goToZero, khz10, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::goToZero, khz1, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::goToZero, hz100, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::goToZero, hz10, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::goToZero, hz1, &ScrollingDigitLabel::on_goToZero);
+    // when max is hit, send all right side digits to zero
+    connect(mhz10, &ScrollingDigitLabel::hitMax, khz100, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::hitMax, khz10, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::hitMax, khz1, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::hitMax, hz100, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::hitMax, hz10, &ScrollingDigitLabel::on_goToZero);
+    connect(mhz10, &ScrollingDigitLabel::hitMax, hz1, &ScrollingDigitLabel::on_goToZero);
+    // digit rolled up so inform the digit to the left
+    connect(khz100, &ScrollingDigitLabel::rolledUp, mhz10, &ScrollingDigitLabel::on_rolledUp);
+    connect(khz10, &ScrollingDigitLabel::rolledUp, khz100, &ScrollingDigitLabel::on_rolledUp);
+    connect(khz1, &ScrollingDigitLabel::rolledUp, khz10, &ScrollingDigitLabel::on_rolledUp);
+    connect(hz100, &ScrollingDigitLabel::rolledUp, khz1, &ScrollingDigitLabel::on_rolledUp);
+    connect(hz10, &ScrollingDigitLabel::rolledUp, hz100, &ScrollingDigitLabel::on_rolledUp);
+    connect(hz1, &ScrollingDigitLabel::rolledUp, hz10, &ScrollingDigitLabel::on_rolledUp);
+    // digit rolled down so inform the digit to the left
+    connect(khz100, &ScrollingDigitLabel::rolledDown, mhz10, &ScrollingDigitLabel::on_rolledDown);
+    connect(khz10, &ScrollingDigitLabel::rolledDown, khz100, &ScrollingDigitLabel::on_rolledDown);
+    connect(khz1, &ScrollingDigitLabel::rolledDown, khz10, &ScrollingDigitLabel::on_rolledDown);
+    connect(hz100, &ScrollingDigitLabel::rolledDown, khz1, &ScrollingDigitLabel::on_rolledDown);
+    connect(hz10, &ScrollingDigitLabel::rolledDown, hz100, &ScrollingDigitLabel::on_rolledDown);
+    connect(hz1, &ScrollingDigitLabel::rolledDown, hz10, &ScrollingDigitLabel::on_rolledDown);
+    // create and set the layout for the digits
+    ui->scrollBox->layout()->addWidget(mhz10);
+    ui->scrollBox->layout()->addWidget(khz100);
+    ui->scrollBox->layout()->addWidget(khz10);
+    ui->scrollBox->layout()->addWidget(khz1);
+    ui->scrollBox->layout()->addWidget(dot);
+    ui->scrollBox->layout()->addWidget(hz100);
+    ui->scrollBox->layout()->addWidget(hz10);
+    ui->scrollBox->layout()->addWidget(hz1);
+}
+
+````
+
 
 ````
 void FT450D::on_valueChanged(const int newval)
