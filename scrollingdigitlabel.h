@@ -5,6 +5,7 @@
 #ifndef SCROLLINGDIGITLABEL_H
 #define SCROLLINGDIGITLABEL_H
 
+#include <QMouseEvent>
 #include <QWheelEvent>
 #include <QLabel>
 /**
@@ -63,6 +64,11 @@ public:
     void setMax(const int newMax) {i_max = newMax;}
     void setMarkMax(bool set) {b_markMax = set;}
     void setHitMax(bool set) {b_hitMax = set;}
+    // overridden double click event to set all to the right to zero
+    void mousePressEvent(QMouseEvent *event) {event->accept();}
+    void mouseReleaseEvent(QMouseEvent *event) {event->accept();}
+    void mouseMovedEvent(QMouseEvent *event) {event->accept();}
+    void mouseDoubleClickEvent(QMouseEvent *event);
     // overridden wheel event which does all the magic
     void wheelEvent(QWheelEvent *event);
 public slots:

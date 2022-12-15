@@ -5,6 +5,13 @@
 #include "scrollingdigitlabel.h"
 #include <QDebug>
 
+void ScrollingDigitLabel::mouseDoubleClickEvent(QMouseEvent *event) {
+    qDebug()<<"double-click!";
+    emit goToZero(); // tell others listening to set to zero, usually to the right
+    emit valueChanged(0);
+    event->accept();
+}
+
 void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
 {    // test the transform of a digit label by mouse wheel
     QPoint numPixels = event->pixelDelta();
