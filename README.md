@@ -12,17 +12,19 @@ This example implementation is for a Ham Radio frequency display where the left-
 An example for the Yaesu FT-450D where mhz10, khz100, khz10, khz1, hz100, hz10 and hz1 are ScrollableDigits objects.
 
 ````
-void FT450D::setupScrollingLabels()
+void YOURPROGRAM::setupScrollingLabels()
 {
     // scrolling labels for control of active VFO
     mhz10 = new ScrollingDigitLabel();
+    mhz10->setAlignment(Qt::AlignRight);
     mhz10->setMin(0);
-    mhz10->setMax(53);
-    mhz10->b_roll = false;
+    mhz10->setMax(29);
+    mhz10->b_roll = false; // stop when min/max reached
     mhz10->setMarkMax(true); // signal when max value reached
     mhz10->setStyleSheet(FREQ_STYLE);
     mhz10->setNum(14);
     mhz10->setMaximumWidth(37);
+    mhz10->setMinimumWidth(37);
 //    ScrollingDigitLabel * mhz1 = new ScrollingDigitLabel();
 //    mhz1.setNum(9);
 //    mhz1->setStyleSheet(FREQ_STYLE);
@@ -54,14 +56,16 @@ void FT450D::setupScrollingLabels()
     hz1->setStyleSheet(FREQ_STYLE);
     hz1->setNum(0);
     hz1->setMaximumWidth(19);
-    connect(mhz10, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
-    connect(khz100, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
-    connect(khz10, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
-    connect(khz1, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
-    connect(hz100, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
-    connect(hz10, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
-    connect(hz1, &ScrollingDigitLabel::valueChanged, this, &FT450D::on_valueChanged);
+    connect(mhz10, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
+    connect(khz100, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
+    connect(khz10, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
+    connect(khz1, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
+    connect(hz100, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
+    connect(hz10, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
+    connect(hz1, &ScrollingDigitLabel::valueChanged, this, &FldigiModem::on_valueChanged);
     // digit hit max so go to zero on all to the right
+    //connect(mhz10, &ScrollingDigitLabel::goToZero, mhz1, &ScrollingDigitLabel::on_goToZero);
+    //connect(mhz1, &ScrollingDigitLabel::goToZero, khz100, &ScrollingDigitLabel::on_goToZero);
     connect(mhz10, &ScrollingDigitLabel::goToZero, khz100, &ScrollingDigitLabel::on_goToZero);
     connect(mhz10, &ScrollingDigitLabel::goToZero, khz10, &ScrollingDigitLabel::on_goToZero);
     connect(mhz10, &ScrollingDigitLabel::goToZero, khz1, &ScrollingDigitLabel::on_goToZero);
@@ -75,7 +79,29 @@ void FT450D::setupScrollingLabels()
     connect(mhz10, &ScrollingDigitLabel::hitMax, hz100, &ScrollingDigitLabel::on_goToZero);
     connect(mhz10, &ScrollingDigitLabel::hitMax, hz10, &ScrollingDigitLabel::on_goToZero);
     connect(mhz10, &ScrollingDigitLabel::hitMax, hz1, &ScrollingDigitLabel::on_goToZero);
+    // from khz100 down
+    connect(khz100, &ScrollingDigitLabel::goToZero, khz10, &ScrollingDigitLabel::on_goToZero);
+    connect(khz100, &ScrollingDigitLabel::goToZero, khz1, &ScrollingDigitLabel::on_goToZero);
+    connect(khz100, &ScrollingDigitLabel::goToZero, hz100, &ScrollingDigitLabel::on_goToZero);
+    connect(khz100, &ScrollingDigitLabel::goToZero, hz10, &ScrollingDigitLabel::on_goToZero);
+    connect(khz100, &ScrollingDigitLabel::goToZero, hz1, &ScrollingDigitLabel::on_goToZero);
+    // from khz10 down
+    connect(khz10, &ScrollingDigitLabel::goToZero, khz1, &ScrollingDigitLabel::on_goToZero);
+    connect(khz10, &ScrollingDigitLabel::goToZero, hz100, &ScrollingDigitLabel::on_goToZero);
+    connect(khz10, &ScrollingDigitLabel::goToZero, hz10, &ScrollingDigitLabel::on_goToZero);
+    connect(khz10, &ScrollingDigitLabel::goToZero, hz1, &ScrollingDigitLabel::on_goToZero);
+    // from khz1 down
+    connect(khz1, &ScrollingDigitLabel::goToZero, hz100, &ScrollingDigitLabel::on_goToZero);
+    connect(khz1, &ScrollingDigitLabel::goToZero, hz10, &ScrollingDigitLabel::on_goToZero);
+    connect(khz1, &ScrollingDigitLabel::goToZero, hz1, &ScrollingDigitLabel::on_goToZero);
+    // from hz100 down
+    connect(hz100, &ScrollingDigitLabel::goToZero, hz10, &ScrollingDigitLabel::on_goToZero);
+    connect(hz100, &ScrollingDigitLabel::goToZero, hz1, &ScrollingDigitLabel::on_goToZero);
+    // finally hz10 down
+    connect(hz10, &ScrollingDigitLabel::goToZero, hz1, &ScrollingDigitLabel::on_goToZero);
     // digit rolled up so inform the digit to the left
+    //connect(mhz1, &ScrollingDigitLabel::rolledUp, mhz10, &ScrollingDigitLabel::on_rolledUp);
+    //connect(khz100, &ScrollingDigitLabel::rolledUp, mhz1, &ScrollingDigitLabel::on_rolledUp);
     connect(khz100, &ScrollingDigitLabel::rolledUp, mhz10, &ScrollingDigitLabel::on_rolledUp);
     connect(khz10, &ScrollingDigitLabel::rolledUp, khz100, &ScrollingDigitLabel::on_rolledUp);
     connect(khz1, &ScrollingDigitLabel::rolledUp, khz10, &ScrollingDigitLabel::on_rolledUp);
@@ -83,14 +109,33 @@ void FT450D::setupScrollingLabels()
     connect(hz10, &ScrollingDigitLabel::rolledUp, hz100, &ScrollingDigitLabel::on_rolledUp);
     connect(hz1, &ScrollingDigitLabel::rolledUp, hz10, &ScrollingDigitLabel::on_rolledUp);
     // digit rolled down so inform the digit to the left
+    //connect(mhz1, &ScrollingDigitLabel::rolledDown, mhz10, &ScrollingDigitLabel::on_rolledDown);
+    //connect(khz100, &ScrollingDigitLabel::rolledDown, mhz1, &ScrollingDigitLabel::on_rolledDown);
     connect(khz100, &ScrollingDigitLabel::rolledDown, mhz10, &ScrollingDigitLabel::on_rolledDown);
     connect(khz10, &ScrollingDigitLabel::rolledDown, khz100, &ScrollingDigitLabel::on_rolledDown);
     connect(khz1, &ScrollingDigitLabel::rolledDown, khz10, &ScrollingDigitLabel::on_rolledDown);
     connect(hz100, &ScrollingDigitLabel::rolledDown, khz1, &ScrollingDigitLabel::on_rolledDown);
     connect(hz10, &ScrollingDigitLabel::rolledDown, hz100, &ScrollingDigitLabel::on_rolledDown);
     connect(hz1, &ScrollingDigitLabel::rolledDown, hz10, &ScrollingDigitLabel::on_rolledDown);
-    // create and set the layout for the digits
-    ui->scrollBox->layout()->addWidget(mhz10);
+   /*
+      // create and set the layout for the digits
+//    QHBoxLayout *scrollLayout = new QHBoxLayout;
+//    qDebug()<<"mhz10 size hint:"<<mhz10->sizeHint();
+//    qDebug()<<"khz10 size hint:"<<khz10->sizeHint();
+//    qDebug()<<"dot size hint:"<<dot->sizeHint();
+//    scrollLayout->setSpacing(0);
+//    scrollLayout->setMargin(0);
+//    scrollLayout->addWidget(mhz10);
+//    //scrollLayout->addWidget(mhz1);
+//    scrollLayout->addWidget(khz100);
+//    scrollLayout->addWidget(khz10);
+//    scrollLayout->addWidget(khz1);
+//    scrollLayout->addWidget(dot);
+//    scrollLayout->addWidget(hz100);
+//    scrollLayout->addWidget(hz10);
+//    scrollLayout->addWidget(hz1);
+    // for a main UI.  use above for portable widgets/toolbars
+     ui->scrollBox->layout()->addWidget(mhz10);
     ui->scrollBox->layout()->addWidget(khz100);
     ui->scrollBox->layout()->addWidget(khz10);
     ui->scrollBox->layout()->addWidget(khz1);
@@ -98,13 +143,13 @@ void FT450D::setupScrollingLabels()
     ui->scrollBox->layout()->addWidget(hz100);
     ui->scrollBox->layout()->addWidget(hz10);
     ui->scrollBox->layout()->addWidget(hz1);
+    */
 }
-
 ````
 on_rolledUp, on_rolledDown, and goToZero are left here as application dependent slot implementations.  Essentially, goToZero just resets the digit to zero.  on_rolledUp and on_rolledDown are dependent on how the application and it's potential hardware may need to react to these events.
 
 ````
-void FT450D::on_valueChanged(const int newval)
+void YOURPROGRAM::on_valueChanged(const int newval)
 {
     Q_UNUSED (newval)
     if (ui->dialLockCheckbox->isChecked())
