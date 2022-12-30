@@ -19,12 +19,13 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
     bool b_dir = 0;
     if (!numPixels.isNull()) {
         b_dir = (numPixels.ry() > 0);
-    } else if (!numDegrees.isNull()) {
+    }
+    else if (!numDegrees.isNull()) {
         QPoint numSteps = numDegrees / 15;
         b_dir = (numSteps.ry() > 0);
     }
     int next;
-    if(b_dir)
+    if(b_dir) // rolled upward
     {
         next = this->text().toInt() + 1;
         if(!b_roll && (next >= i_max))
@@ -42,13 +43,17 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
                 emit rolledUp();
             }
         }
-        this->setText(QString::number(next));
+        if(next < 10)
+            this->setText("0" + QString::number(next));
+        else
+            this->setNum(next);
         emit valueChanged(next);
     }
-    else
+    else // rolled downward
     {
         b_hitMax = false;
         next = this->text().toInt() - 1;
+        //qDebug()<<"i_min:"<<i_min;
         if(next < i_min)
         {
             if(b_roll)
@@ -56,8 +61,14 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
                 next = i_max;
                 emit rolledDown();
             }
+            else {
+                return;// don't change it
+            }
         }
-        this->setText(QString::number(next));
+        if(next < 10)
+            this->setText("0" + QString::number(next));
+        else
+            this->setNum(next);
         emit valueChanged(next);
     }
     event->accept();
@@ -73,7 +84,7 @@ void ScrollingDigitLabel::on_rolledUp()
         if(b_markMax)
             emit hitMax();
         emit goToZero();
-        this->setText(QString::number(i_max));
+        this->setNum(i_max);
         return;
     }
     if(next > i_max)
@@ -82,11 +93,11 @@ void ScrollingDigitLabel::on_rolledUp()
         {
             next = i_min;
             emit rolledUp();  // this digit needs to talk to the one on it's left also
-            this->setText(QString::number(next));
+            this->setNum(next);
         }
     }
     else {
-        this->setText(QString::number(next));
+        this->setNum(next);
     }
     //emit valueChanged(next);
 }
@@ -99,7 +110,7 @@ void ScrollingDigitLabel::on_rolledDown()
         // qDebug()<<"goToZero";
         //
         emit goToZero();
-        this->setText(QString::number(prev));
+        this->setNum(prev);
         return;
     }
     if(prev < i_min)
@@ -108,18 +119,18 @@ void ScrollingDigitLabel::on_rolledDown()
         {
             prev = i_max;
             emit rolledDown();  // this digit needs to talk to the one on it's left also
-            this->setText(QString::number(prev));
+            this->setNum(prev);
         }
     }
     else {
-        this->setText(QString::number(prev));
+        this->setNum(prev);
     }
     //emit valueChanged(prev);
 }
 
 void ScrollingDigitLabel::on_goToZero()
 {
-    this->setText("0");
+    this->setNum(0);
     //emit valueChanged(0);
 }
 
