@@ -43,10 +43,7 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
                 emit rolledUp();
             }
         }
-        if(next < 10)
-            this->setText("0" + QString::number(next));
-        else
-            this->setNum(next);
+        this->setNum(next);
         emit valueChanged(next);
     }
     else // rolled downward
