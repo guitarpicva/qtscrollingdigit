@@ -43,7 +43,14 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
                 emit rolledUp();
             }
         }
-        this->setNum(next);
+        if(i_max > 9) {
+            if(next < 10)
+                this->setText("0" + QString::number(next));
+            else
+                this->setNum(next);
+        }
+        else
+            this->setNum(next);
         emit valueChanged(next);
     }
     else // rolled downward
@@ -62,7 +69,14 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
                 return;// don't change it
             }
         }
-        this->setNum(next);
+        if(i_max > 9) {
+            if(next < 10)
+                this->setText("0" + QString::number(next));
+            else
+                this->setNum(next);
+        }
+        else
+            this->setNum(next);
         emit valueChanged(next);
     }
     event->accept();
@@ -70,8 +84,8 @@ void ScrollingDigitLabel::wheelEvent(QWheelEvent *event)
 
 void ScrollingDigitLabel::on_rolledUp()
 {
+    //qDebug()<<"on_rolledUp:"<<this->text().toInt();
     int next = this->text().toInt() + 1;
-    //qDebug()<<"on_rolledUp()"<<next;
     if(!b_roll && (next >= i_max))
     {
         //qDebug()<<"goToZero";
@@ -98,6 +112,7 @@ void ScrollingDigitLabel::on_rolledUp()
 
 void ScrollingDigitLabel::on_rolledDown()
 {
+    //qDebug()<<"on_rolledDown:"<<this->text();
     int prev = this->text().toInt() - 1;
     if(!b_roll && (prev == i_min))
     {
