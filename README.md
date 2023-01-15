@@ -117,25 +117,8 @@ void YOURPROGRAM::setupScrollingLabels()
     connect(hz100, &ScrollingDigitLabel::rolledDown, khz1, &ScrollingDigitLabel::on_rolledDown);
     connect(hz10, &ScrollingDigitLabel::rolledDown, hz100, &ScrollingDigitLabel::on_rolledDown);
     connect(hz1, &ScrollingDigitLabel::rolledDown, hz10, &ScrollingDigitLabel::on_rolledDown);
-   /*
-      // create and set the layout for the digits
-//    QHBoxLayout *scrollLayout = new QHBoxLayout;
-//    qDebug()<<"mhz10 size hint:"<<mhz10->sizeHint();
-//    qDebug()<<"khz10 size hint:"<<khz10->sizeHint();
-//    qDebug()<<"dot size hint:"<<dot->sizeHint();
-//    scrollLayout->setSpacing(0);
-//    scrollLayout->setMargin(0);
-//    scrollLayout->addWidget(mhz10);
-//    //scrollLayout->addWidget(mhz1);
-//    scrollLayout->addWidget(khz100);
-//    scrollLayout->addWidget(khz10);
-//    scrollLayout->addWidget(khz1);
-//    scrollLayout->addWidget(dot);
-//    scrollLayout->addWidget(hz100);
-//    scrollLayout->addWidget(hz10);
-//    scrollLayout->addWidget(hz1);
-    // for a main UI.  use above for portable widgets/toolbars
-     ui->scrollBox->layout()->addWidget(mhz10);
+   /* // to add the digits to a QGroupBox perhaps...
+    ui->scrollBox->layout()->addWidget(mhz10);
     ui->scrollBox->layout()->addWidget(khz100);
     ui->scrollBox->layout()->addWidget(khz10);
     ui->scrollBox->layout()->addWidget(khz1);
